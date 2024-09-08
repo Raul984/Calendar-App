@@ -57,9 +57,9 @@ export default {
   },
   mounted() {
     this.loadEventsFromLocalStorage(); // Загрузка событий при создании компонента
-    setTimeout(() => {
+    this.$nextTick(() => {
       this.applyAllEventColors(); // Применяем цвета после загрузки
-    }, 1000);
+    });
   },
   methods: {
     // Метод для загрузки событий из localStorage
@@ -82,6 +82,9 @@ export default {
         end: event.end.toISOString()
       }));
       localStorage.setItem('events', JSON.stringify(eventsToStore));
+      this.$nextTick(() => {
+        this.applyAllEventColors(); // Применяем цвета после загрузки
+      });
     },
     // Метод для добавления нового события
     addEvent(date) {
@@ -149,11 +152,6 @@ export default {
         event.id = Date.now(); // Уникальный ID для события
         this.events.push({ ...event, start: new Date(startDateTime), end: new Date(endDateTime) });
       }
-
-      this.$nextTick(() => {
-        this.applyEventColor(event); // Применяем цвет
-      });
-      
       this.showForm = false; // Закрываем форму
     },
 
@@ -181,13 +179,11 @@ export default {
     onViewChange() {
       setTimeout(() => {
         this.applyAllEventColors(); // Применяем цвета после изменения вида
-      }, 1000);
+      }, 500);
     },
 
     // Метод для обработки перетаскивания событий в календаре
     onEventDrop({ event }) {
-      console.log('drop-event', event);
-
       // Проверяем встроенное событие
       if (event.isTrusted) {
         return; // Игнорируем встроенные события
@@ -202,9 +198,6 @@ export default {
         this.events[eventIndex].start = event.start;
         this.events[eventIndex].end = event.end;
       }
-      this.$nextTick(() => {
-        this.applyEventColor(event); // Применяем цвет
-      });
     },
 
     // Метод для обработки удаления событий в календаре
